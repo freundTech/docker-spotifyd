@@ -5,10 +5,10 @@ ARG BRANCH=master
 WORKDIR /usr/src/spotifyd
 
 RUN apt-get -yqq update && \
-    apt-get install --no-install-recommends -yqq libasound2-dev && \
+    apt-get install --no-install-recommends -yqq libasound2-dev libpulse-dev && \
     git clone --branch=${BRANCH} https://github.com/Spotifyd/spotifyd.git . 
 
-RUN cargo build --release
+RUN cargo build --release --features "pulseaudio_backend"
 
 FROM debian:buster-slim as release
 
