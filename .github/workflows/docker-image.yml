@@ -12,41 +12,39 @@ jobs:
       - name: Check Out Repo 
         uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to registry
+        id: docker_login
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Create Manifest
         id: docker_manifest
         run: |-
-          docker manifest create ${{ secrets.docker_USERNAME }}/spotifyd:latest \
-          ${{ secrets.docker_USERNAME }}/spotifyd:amd64 \
-          ${{ secrets.docker_USERNAME }}/spotifyd:arm64 \
-          ${{ secrets.docker_USERNAME }}/spotifyd:armel \
-          ${{ secrets.docker_USERNAME }}/spotifyd:armhf
+          docker manifest create ghcr.io/${{ github.repository_owner }}/spotifyd:latest \
+          ghcr.io/${{ github.repository_owner }}/spotifyd:amd64 \
+          ghcr.io/${{ github.repository_owner }}/spotifyd:arm64 \
+          ghcr.io/${{ github.repository_owner }}/spotifyd:armel \
+          ghcr.io/${{ github.repository_owner }}/spotifyd:armhf
           
       - name: AMD64
         id: x86_64
-        run: docker manifest annotate --arch amd64 --os linux ${{ secrets.docker_USERNAME }}/spotifyd:latest ${{ secrets.docker_USERNAME }}/spotifyd:amd64
+        run: docker manifest annotate --arch amd64 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:amd64
         
       - name: ARM64
         id: arm64
-        run: docker manifest annotate --arch arm64 --variant v8 --os linux ${{ secrets.docker_USERNAME }}/spotifyd:latest ${{ secrets.docker_USERNAME }}/spotifyd:arm64
+        run: docker manifest annotate --arch arm64 --variant v8 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:arm64
 
       - name: ARMHF
         id: armv7
-        run: docker manifest annotate --arch arm --variant v7 --os linux ${{ secrets.docker_USERNAME }}/spotifyd:latest ${{ secrets.docker_USERNAME }}/spotifyd:armhf
+        run: docker manifest annotate --arch arm --variant v7 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:armhf
  
       - name: ARMEL
         id: armv5
-        run: docker manifest annotate --arch arm --variant v5 --os linux ${{ secrets.docker_USERNAME }}/spotifyd:latest ${{ secrets.docker_USERNAME }}/spotifyd:armel
+        run: docker manifest annotate --arch arm --variant v5 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:armel
  
       - name: Push Manifest
         id: docker_push
-        run: docker manifest push ${{ secrets.docker_USERNAME}}/spotifyd:latest
+        run: docker manifest push ghcr.io/${{ github.repository_owner }}/spotifyd:latest
         
       - name: Inspect Manifest
         id: docker_inspect
-        run: docker manifest inspect ${{ secrets.docker_USERNAME }}/spotifyd:latest
+        run: docker manifest inspect ghcr.io/${{ github.repository_owner }}/spotifyd:latest
