@@ -9,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out Repo 
+      - name: downcase repository_owner
+        run: |
+          echo "OWNER=${GITHUB_REPOSITORY_OWNER,,}" >>${GITHUB_ENV}
+      - name: Check Out Repo
         uses: actions/checkout@v2
 
       - name: Log in to registry
@@ -19,32 +22,31 @@ jobs:
       - name: Create Manifest
         id: docker_manifest
         run: |-
-          docker manifest create ghcr.io/${{ github.repository_owner }}/spotifyd:latest \
-          ghcr.io/${{ github.repository_owner }}/spotifyd:amd64 \
-          ghcr.io/${{ github.repository_owner }}/spotifyd:arm64 \
-          ghcr.io/${{ github.repository_owner }}/spotifyd:armel \
-          ghcr.io/${{ github.repository_owner }}/spotifyd:armhf
+          docker manifest create ghcr.io/${OWNER}/spotifyd:latest \
+          ghcr.io/${OWNER}/spotifyd:amd64 \
+          ghcr.io/${OWNER}/spotifyd:armel \
+          ghcr.io/${OWNER}/spotifyd:armhf
           
       - name: AMD64
         id: x86_64
-        run: docker manifest annotate --arch amd64 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:amd64
+        run: docker manifest annotate --arch amd64 --os linux ghcr.io/${OWNER}/spotifyd:latest ghcr.io/${OWNER}/spotifyd:amd64
         
       - name: ARM64
         id: arm64
-        run: docker manifest annotate --arch arm64 --variant v8 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:arm64
+        run: docker manifest annotate --arch arm64 --variant v8 --os linux ghcr.io/${OWNER}/spotifyd:latest ghcr.io/${OWNER}/spotifyd:arm64
 
       - name: ARMHF
         id: armv7
-        run: docker manifest annotate --arch arm --variant v7 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:armhf
+        run: docker manifest annotate --arch arm --variant v7 --os linux ghcr.io/${OWNER}/spotifyd:latest ghcr.io/${OWNER}/spotifyd:armhf
  
       - name: ARMEL
         id: armv5
-        run: docker manifest annotate --arch arm --variant v5 --os linux ghcr.io/${{ github.repository_owner }}/spotifyd:latest ghcr.io/${{ github.repository_owner }}/spotifyd:armel
+        run: docker manifest annotate --arch arm --variant v5 --os linux ghcr.io/${OWNER}/spotifyd:latest ghcr.io/${OWNER}/spotifyd:armel
  
       - name: Push Manifest
         id: docker_push
-        run: docker manifest push ghcr.io/${{ github.repository_owner }}/spotifyd:latest
+        run: docker manifest push ghcr.io/${OWNER}/spotifyd:latest
         
       - name: Inspect Manifest
         id: docker_inspect
-        run: docker manifest inspect ghcr.io/${{ github.repository_owner }}/spotifyd:latest
+        run: docker manifest inspect ghcr.io/${OWNER}/spotifyd:latest
