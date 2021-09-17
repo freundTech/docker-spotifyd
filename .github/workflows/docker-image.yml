@@ -22,7 +22,7 @@ jobs:
       - name: Create Manifest
         id: docker_manifest
         run: |-
-          docker manifest create ghcr.io/${OWNER}/spotifyd:latest \
+          docker manifest create ${OWNER}/spotifyd:latest \
           ghcr.io/${OWNER}/spotifyd:amd64 \
           ghcr.io/${OWNER}/spotifyd:armel \
           ghcr.io/${OWNER}/spotifyd:armhf
@@ -45,8 +45,8 @@ jobs:
  
       - name: Push Manifest
         id: docker_push
-        run: docker manifest push ghcr.io/${OWNER}/spotifyd:latest
+        run: docker manifest push ${OWNER}/spotifyd:latest
         
       - name: Inspect Manifest
         id: docker_inspect
-        run: docker manifest inspect ghcr.io/${OWNER}/spotifyd:latest
+        run: docker manifest inspect ${OWNER}/spotifyd:latest
